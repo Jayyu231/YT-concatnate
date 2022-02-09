@@ -1,37 +1,26 @@
-import urllib.request
-import json
+from YT_concatnate.pipeline.steps.get_video_list import GetVideoList
+from YT_concatnate.pipeline.pipeline import Pipeline
 
-from YT_concatnate.setting import API_KEY
-
-channel_id = 'UCKSVUHI9rbbkXhvAXK-2uxA'
-print(API_KEY)
+CHANNEL_ID = 'UCKSVUHI9rbbkXhvAXK-2uxA'
 
 
-def get_all_video_in_channel(channel_id):
+def main():
+    inputs = {
+        'CHANNEL_ID': CHANNEL_ID
 
-    base_video_url = 'https://www.youtube.com/watch?v='
-    base_search_url = 'https://www.googleapis.com/youtube/v3/search?'
+    }
+    steps = [
+        GetVideoList()
+    ]
 
-    first_url = base_search_url+'key={}&channelId={}&part=snippet,id&order=date&maxResults=25'.format(API_KEY, channel_id)
-
-    video_links = []
-    url = first_url
-    while True:
-        inp = urllib.request.urlopen(url)
-        resp = json.load(inp)
-
-        for i in resp['items']:
-            if i['id']['kind'] == "youtube#video":
-                video_links.append(base_video_url + i['id']['videoId'])
-
-        try:
-            next_page_token = resp['nextPageToken']
-            url = first_url + '&pageToken={}'.format(next_page_token)
-        except KeyError:
-            break
-    print(len(video_links))
-    print(video_links)
-    return video_links
+    p = Pipeline(steps)
+    p.run(inputs)
 
 
-get_all_video_in_channel(channel_id)
+if __name__ == '__main__':
+    main()
+
+
+
+
+
